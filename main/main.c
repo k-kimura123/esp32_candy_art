@@ -7,10 +7,20 @@
 #include "include/color_sensor.h"
 #include "include/servo_motor.h"
 #include "include/stepper_motor.h"
+#include "include/myserver_config.h"
+#include "include/wifi_config.h"
 #include "sdkconfig.h"
+
 
 #define IMAGE_WIDTH   8
 #define IMAGE_HEIGHT  8
+
+char pixel_info[8][8];
+
+extern int pixelinfo_flag;
+extern char pixelinfo_query[1024];
+//extern char pixelinfo[8][8]; 
+
 
 /***************************************
  * Testing color sensor functionality
@@ -133,6 +143,44 @@ void sg90_task(void *ignore) {
  * Testing integrated functionality
  ***************************************/
 void test_task() {
+	while(1){
+		printf("test_task initiated");
+		printf("\n");
+		printf("flag: %d",pixelinfo_flag);
+		printf("\n");
+		vTaskDelay(pdMS_TO_TICKS(1000));
+		while(pixelinfo_flag == 1){
+			printf("pixelinfo received\n");
+			//strcpy(pixel_info,pixelinfo);
+			
+			
+			int x = 0;
+			int y = 1;
+			pixel_info[0][0] = toupper(pixelinfo_query[0]);
+			
+			for (int i =1; i < strlen(pixelinfo_query); i++){
+				if(pixelinfo_query[i] == 'C'){
+					pixel_info[x][y] = toupper(pixelinfo_query[i + 1]);
+					y++;
+					if(y == 8){
+						y = 0;
+						x++;
+					}
+				}
+			}
+			for (int h = 0; h < 8; h++){
+				for (int j = 0; j < 8; j++){
+					printf("%c",pixel_info[h][j]);
+					
+				}
+				printf("\n");
+			}
+			
+			pixelinfo_flag = 0;
+		}
+	}
+	
+	/*
 	char pixel_info[IMAGE_HEIGHT][IMAGE_WIDTH] = {
 		{'R', 'Y', 'O', 'R', 'O', 'Y', 'R', 'Y'}, 
 		{'Y', 'O', 'Y', 'G', 'P', 'G', 'O', 'G'}, 
@@ -143,7 +191,7 @@ void test_task() {
 		{'R', 'Y', 'P', 'Y', 'P', 'Y', 'P', 'G'},
 		{'O', 'G', 'R', 'O', 'G', 'R', 'G', 'O'}
 	};
-
+	
 	double pulsewidth[9] = {C0, C1, C2, C3, C4, C5, C6, C7, C8};
 
 	esp_err_t ret = i2c_master_init(I2C_PORT_NUM);
@@ -201,6 +249,8 @@ void test_task() {
 		}
 		vTaskDelay(100);
 	}
+	*/
+	vTaskDelete(NULL);
 }
 
 /************************************
@@ -210,5 +260,11 @@ void app_main() {
 	// xTaskCreate(&tcs34725_task, "tcs34725_task", 2048, NULL, 5, NULL);
 	// xTaskCreate(&drv8825_task, "drv8825_task", 2048, NULL, 10, NULL);
 	// xTaskCreate(&sg90_task, "sg90_task", 2048, NULL, 5, NULL);
-	xTaskCreate(&test_task, "test_task", 2048, NULL, 5, NULL);
+	spiffs_setup();
+	xTaskCreate(&test_task, "test_task", 2048, NULL, 1, NULL);
+	wifiInit();
+
+	serverconfig();
+	
+	
 }
