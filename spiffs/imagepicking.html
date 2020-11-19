@@ -24,12 +24,13 @@
             </div>
         </div>
         <div>
-            <button onclick="getpickingarray()">Pick this one</button>
+            <form action="/sent" id="pickingform" method="get">
+                <input type="hidden" id="pickingforminput" name="pixelarray">
+                <input type="button" onclick="getpickingarray()" value="Pick this one!!!">
+            </form>
+            
+            
         </div>
-        <!--
-        <button id="prevBtn" onclick="carousel_prev()">Prev</button>
-        <button id="nextBtn" onclick="carousel_next()">Next</button>-->
-        
         <script src="pickingscript.js" async defer></script>
         
     </body>

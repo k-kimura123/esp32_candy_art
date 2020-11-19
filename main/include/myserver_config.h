@@ -11,6 +11,7 @@
 #define TAG "MY SERVER"
 
 
+
 void spiffs_setup();
 int readFile(char *fname,httpd_req_t *req);
 esp_err_t send_indexhtml(httpd_req_t *req);
@@ -28,4 +29,5 @@ esp_err_t send_image1(httpd_req_t *req);
 esp_err_t send_image2(httpd_req_t *req);
 esp_err_t send_image3(httpd_req_t *req);
 esp_err_t send_image4(httpd_req_t *req);
+esp_err_t reset_req(httpd_req_t *req);
 void serverconfig();

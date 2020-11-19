@@ -1,7 +1,14 @@
 #include "myserver_config.h"
+#include "mytask.h"
 
 char pixelinfo_query[1024];
 int pixelinfo_flag = 0;
+int reset_flag = 0;
+int initialize_flag = 0;
+
+TaskHandle_t testtaskhandle = NULL;
+TaskHandle_t steppertask = NULL;
+
 
 void spiffs_setup(){
 	ESP_LOGI(TAG, "Initializing SPIFFS");
@@ -134,16 +141,8 @@ esp_err_t send_indexhtml(httpd_req_t *req){
 	printf("main page requested\r\n");
 	httpd_resp_set_type(req,"text/html");
 	readFile("/spiffs/index.html",req);
-	/*
-	indexbuf_len = httpd_req_get_url_query_len(req) + 1;
-	if(indexbuf_len > 1){
-		indexbuf = malloc(indexbuf_len);
-		if(httpd_req_get_url_query_str(req,indexbuf,indexbuf_len) == ESP_OK){
-			ESP_LOGI(TAG,"Found URL query => %s",indexbuf);
-		}
-		free(indexbuf);
-	}
-	*/
+	
+	
 	return ESP_OK;
 }
 
@@ -179,7 +178,10 @@ esp_err_t send_senthtml(httpd_req_t *req){
 				ESP_LOGI(TAG,"FOUND URL query parameter => %s",param);
 			}
 			strcpy(pixelinfo_query,param);
+			printf("Task Created");
 			pixelinfo_flag = 1;
+			xTaskCreate(&test_task, "test_task", 2048, NULL, 1, &testtaskhandle);
+			
 			/*
 			int x = 0;
 			int y = 1;
@@ -483,6 +485,41 @@ esp_err_t send_image4(httpd_req_t *req){
 	return ESP_OK;
 }
 
+esp_err_t reset_req(httpd_req_t *req){
+	ESP_LOGI(TAG, "url %s was hit", req->uri);
+	//char *message = "Restarting in 3sec";
+	
+	/*
+	const char* resp_str = (const char*) readFile("/spiffs/bootstrap.min.js");
+
+	//seting response headers
+	httpd_resp_set_hdr(req,"status","200");
+	httpd_resp_set_hdr(req,"content-type","text/javascript; charset=UTF-8");
+	//httpd_resp_set_hdr(req,"server","ESP32-10103");
+
+	httpd_resp_send(req,resp_str, strlen(resp_str));
+	*/
+	printf("Restarting in 3 sec\n");
+	httpd_resp_set_type(req,"text/html");
+	readFile("/spiffs/reset.html",req);
+	initialize_flag = 1;
+	vTaskDelete(testtaskhandle);
+	vTaskDelete(steppertask);
+	//httpd_resp_set_type(req,"text/plain");
+	//httpd_resp_send(req,message,strlen(message));
+	
+	//reset_flag = 1;
+	//pixelinfo_flag = 0;
+	
+	printf("Task aborted");
+	//vTaskDelay(pdMS_TO_TICKS(3000));
+	//Go to home page
+	//reset_flag = 0;
+	//xTaskCreate(&test_task, "test_task", 2048, NULL, 1, NULL);
+
+	return ESP_OK;
+}
+
 void serverconfig(){
     httpd_handle_t server = NULL;
 	httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -583,6 +620,12 @@ void serverconfig(){
 		.method = HTTP_GET,
 		.handler = send_image4
 	};
+
+	httpd_uri_t reset = {
+		.uri = "/reset.html",
+		.method = HTTP_GET,
+		.handler = reset_req
+	};
 	
 	httpd_register_uri_handler(server, &index_html);
 	httpd_register_uri_handler(server, &sent_html);
@@ -599,4 +642,5 @@ void serverconfig(){
 	httpd_register_uri_handler(server, &image2);
 	httpd_register_uri_handler(server, &image3);
 	httpd_register_uri_handler(server, &image4);
+	httpd_register_uri_handler(server, &reset);
 }

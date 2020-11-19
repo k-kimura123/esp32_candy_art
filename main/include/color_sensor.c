@@ -154,9 +154,11 @@ esp_err_t i2c_tcs34725_init(i2c_port_t i2c_num, tcs34725_t *sensor, tcs34725_int
  *************************************************/
 esp_err_t i2c_tcs34725_get_rgbc_data(i2c_port_t i2c_num, tcs34725_t *sensor, tcs34725_rgbc_data_t *rgbc_values) {
 	// Checking if TCS34725 has been initialized
+	/*
 	if (!(sensor->initialized)) {
 		return ESP_FAIL;
 	}
+	*/
 	
 	uint8_t red[2];
 	uint8_t green[2];
@@ -224,11 +226,11 @@ int check_rgb_color(tcs34725_rgbc_data_t *rgbc_values, char pixel_info[IMAGE_HEI
 	char color = '\0';
 
 	// Matching color detected
-	if ((red >= 240 - THRESHOLD && red <= 240 + THRESHOLD) && (green >= 10 - THRESHOLD && green <= 10 + THRESHOLD) && (blue >= 10 - THRESHOLD && blue <= 10 + THRESHOLD)) {
-		printf("Red\n");
-		color = 'R';
-	}
-	else if ((red >= 127 - THRESHOLD && red <= 127 + THRESHOLD) && (green >= 10 - THRESHOLD && green <= 10 + THRESHOLD) && (blue >= 10 - THRESHOLD && blue <= 10 + THRESHOLD)) {
+	// if ((red >= 240 - THRESHOLD && red <= 240 + THRESHOLD) && (green >= 10 - THRESHOLD && green <= 10 + THRESHOLD) && (blue >= 10 - THRESHOLD && blue <= 10 + THRESHOLD)) {
+	// 	printf("Red\n");
+	// 	color = 'R';
+	// }
+	if ((red >= 150 - THRESHOLD && red <= 150 + THRESHOLD) && (green >= 58 - THRESHOLD && green <= 58 + THRESHOLD) && (blue >= 58 - THRESHOLD && blue <= 58 + THRESHOLD)) {
 		printf("Purple\n");
 		color = 'P';
 	}
@@ -242,10 +244,10 @@ int check_rgb_color(tcs34725_rgbc_data_t *rgbc_values, char pixel_info[IMAGE_HEI
 		color = 'O';
 	}
 	// else if (green == 42.5 && blue == 42.5) {
-	else if ((red >= 153 - THRESHOLD && red <= 153 + THRESHOLD) && (green >= 65 - THRESHOLD && green <= 65 + THRESHOLD) && (blue >= 25 - THRESHOLD && blue <= 25 + THRESHOLD)) {
-		printf("Yellow\n");
-		color = 'Y';
-	}
+	// else if ((red >= 153 - THRESHOLD && red <= 153 + THRESHOLD) && (green >= 65 - THRESHOLD && green <= 65 + THRESHOLD) && (blue >= 25 - THRESHOLD && blue <= 25 + THRESHOLD)) {
+	// 	printf("Yellow\n");
+	// 	color = 'Y';
+	// }
 	else {
 		// printf("Red: %f, Green: %f, Blue: %f\n", red, green, blue);
 	}
@@ -267,8 +269,8 @@ int check_rgb_color(tcs34725_rgbc_data_t *rgbc_values, char pixel_info[IMAGE_HEI
 			}
 		}
 		
-		printf("Row: %d, Column: %d\n", row, column);
 		if ((row >= 0 && row < IMAGE_WIDTH) && (column >= 0 && column < IMAGE_HEIGHT)) {
+			printf("Row: %d, Column: %d\n", row, column);
 			break;
 		}
 	}

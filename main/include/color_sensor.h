@@ -77,7 +77,7 @@
 // Pixel Image Data Variables
 #define IMAGE_WIDTH             8
 #define IMAGE_HEIGHT            8
-#define THRESHOLD               15
+#define THRESHOLD               30
 
 /************************
 * STRUCTS
