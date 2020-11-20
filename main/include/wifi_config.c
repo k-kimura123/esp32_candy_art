@@ -18,7 +18,7 @@ void wifiInit(){
 	ESP_ERROR_CHECK(tcpip_adapter_dhcps_start(TCPIP_ADAPTER_IF_AP));
 	
 	printf("Server started \n");
-	//ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL));
+	
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 	
 	wifi_init_config_t wifi_config = WIFI_INIT_CONFIG_DEFAULT();

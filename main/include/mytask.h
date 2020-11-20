@@ -12,8 +12,6 @@
 #define IMAGE_WIDTH   8
 #define IMAGE_HEIGHT  8
 
-
-
 void tcs34725_task(void *ignore);
 void drv8825_task(void *ignore);
 void sg90_task(void *ignore);
